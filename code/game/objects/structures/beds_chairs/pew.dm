@@ -70,3 +70,19 @@
 /obj/structure/chair/pew/right/post_unbuckle_mob()
 	. = ..()
 	update_rightpewarmrest()
+
+/obj/structure/chair/pew/proc/can_user_rotate(mob/user)
+	var/mob/living/LivingUser = user
+
+	if(istype(L))
+		if(!user.canUseTopic(src, BE_CLOSE, NO_DEXTERITY, FALSE, !iscyborg(user)))
+			return FALSE
+		else
+			obj/item/tool = LivingUser.get_active_held_item()
+			if(!tool || !tool.tool_behaviour || tool.tool_behavior != TOOL_WRENCH)
+				to_chat(user, span_warning("You need to equip a wrench in your active slot to rotate the pew."))
+				return FALSE // tochat the user
+			return TRUE
+	else if(isobserver(user) && CONFIG_GET(flag/ghost_interaction))
+		return TRUE
+	return FALSE
